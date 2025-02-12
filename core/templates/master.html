@@ -1,0 +1,157 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>:: Carona IFMG ::</title>
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/toastr.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/crud.css' %}">
+    <link rel="icon" href="{% static 'img/favicon.png' %}" type="image/x-icon">
+
+    <script src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/toastr.min.js' %}"></script>
+</head>
+<body class="custom-body">
+    <div class="container-fluid">
+        <header id="menu_navegacao" class="custom-header">
+            <nav class="navbar navbar-expand-md navbar-light bg-light">
+                <a class="navbar-brand" href="{% url 'core:main' %}">HOME</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarMenuExemplo" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Arquivo
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarMenuExemplo">
+                                <a class="dropdown-item" href="#">Meus Dados</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{% url 'autenticacao:logout' %}">
+                                    <img src="{% static 'img/my_logout.png' %}" width="20px" alt="Logout">
+                                    Sair
+                                </a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarMenuExemplo" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Caronas
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarMenuExemplo">
+                                <a class="dropdown-item" href="#">Oferecer Carona</a>
+                                <a class="dropdown-item" href="#">Meus Carros</a>
+                                <a class="dropdown-item" href="#">Buscar Carona</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <div class="content mt-5">
+            {% block conteudo %}
+            {% endblock %}
+        </div>
+
+        <!-- janela sobre -->
+        <div class="modal fade" id="jnlSobre" tabindex="-1" role="dialog" aria-labelledby="jnlSobreRotulo" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="jnlSobreRotulo">Sobre o Sistema de Carona</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-justify">
+                        <p>
+                            O Sistema de Carona IFMG foi desenvolvido para permitir que estudantes e funcionários do IFMG se cadastrem, 
+                            ofereçam caronas ou procurem caronas para facilitar o deslocamento entre o campus e os arredores.
+                        </p>
+                        <p>
+                            Este projeto foi desenvolvido com o intuito de proporcionar mais praticidade e segurança aos usuários, 
+                            utilizando tecnologia web para facilitar o processo de encontrar e oferecer caronas de forma eficiente.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer id="rodape" class="custom-footer">
+            <div class="footer-text text-center">
+                Sistema de Carona IFMG 
+                <button id="btnSobre" class="btn btn-info btn-sm">Sobre</button><br>
+                Este sistema está licenciado sob 
+                <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style="color: #B0C4DE;">
+                    Licença Creative Commons&copy; 4.0 
+                </a> 
+                <img src="#" width="45px" alt="Creative Commons"> <br>
+                Disponível para download em 
+                <a href="https://github.com/ifmg/carona" target="_blank" rel="noopener noreferrer" style="color: #B0C4DE;">
+                    github.com/ifmg/carona
+                </a>
+                <img src="{% static 'img/github.png' %}" width="15px" alt="GitHub">
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        //exibir modal sobre
+        $('#btnSobre').click(function() {
+            $('#jnlSobre').modal('show');
+        });
+
+        //eventos que serao usados no caso do cadastro ser carregado em forma modal
+        window.addEventListener('load', function() {
+            if (window.opener) {
+                var header = document.getElementById('rodape');
+                var footer = document.getElementById('menu_navegacao');
+                
+                if (header) header.style.display = 'none';
+                if (footer) footer.style.display = 'none';
+            }
+        });
+
+        window.onbeforeunload = function() {
+            if (window.opener && !window.opener.closed) {
+                window.opener.location.reload();
+                window.opener.window.opener.desabilitaInteracoes();                
+            }
+        };
+
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+
+            {% if messages %}
+                {% for message in messages %}
+                    toastr.{{ message.tags }}("{{ message }}");
+                {% endfor %}
+            {% endif %}
+        });
+    </script>
+</body>
+</html>
