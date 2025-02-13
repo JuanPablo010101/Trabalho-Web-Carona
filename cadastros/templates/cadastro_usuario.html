@@ -6,6 +6,7 @@
     <h2>Cadastro</h2>
     <form id="formCadastro" method="POST" action="{% url 'cadastros:cadastro_usuario' %}">
         {% csrf_token %}
+        
         <div class="form-group">
             <label for="txtNome">Nome completo</label>
             <input type="text" class="form-control" id="txtNome" name="txtNome" required>
@@ -17,6 +18,11 @@
         </div>
 
         <div class="form-group">
+            <label for="txtTelefone">Telefone</label>
+            <input type="text" class="form-control" id="txtTelefone" name="txtTelefone" pattern="\(\d{2}\) \d{4,5}-\d{4}" placeholder="(99) 99999-9999" required>
+        </div>
+
+        <div class="form-group">
             <label for="txtSenha">Senha</label>
             <input type="password" class="form-control" id="txtSenha" name="txtSenha" required>
         </div>
@@ -25,6 +31,8 @@
             <label for="confirmar_senha">Confirmar senha</label>
             <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
         </div>
+
+        <input type="hidden" name="is_active" value="True">
 
         <div class="form-check">
             <input type="checkbox" class="form-check-input" id="termos" required>
@@ -64,27 +72,35 @@
 <script>
     $(document).ready(function () {
         $('#formCadastro').submit(function (event) {
-                     
             let nome = $('#txtNome').val().trim();
             let email = $('#txtEmail').val().trim();
+            let telefone = $('#txtTelefone').val().trim();
             let senha = $('#txtSenha').val();
             let confirmarSenha = $('#confirmar_senha').val();
             
-            if (nome === "" || email === "" || senha === "" || confirmarSenha === "") {
+            if (nome === "" || email === "" || telefone === "" || senha === "" || confirmarSenha === "") {
                 toastr.error("Todos os campos devem ser preenchidos.", "Erro");
+                event.preventDefault();
+                return;
+            }
+
+            if (!telefone.match(/^\(\d{2}\) \d{4,5}-\d{4}$/)) {
+                toastr.warning("Formato de telefone inválido. Use (99) 99999-9999.", "Aviso");
+                event.preventDefault();
                 return;
             }
 
             if (senha.length < 6) {
                 toastr.warning("A senha deve ter no mínimo 6 caracteres.", "Aviso");
+                event.preventDefault();
                 return;
             }
 
             if (senha !== confirmarSenha) {
                 toastr.error("As senhas não coincidem.", "Erro");
+                event.preventDefault();
                 return;
             }
-
         });
     });
 </script>

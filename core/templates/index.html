@@ -15,13 +15,36 @@
     <script src="{% static 'js/popper.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/toastr.min.js' %}"></script>
+
+    <style>
+        /* Adicionando suporte ao modo escuro */
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        /* Estilos para modo escuro */
+        body.dark-mode {
+            background-color: #121212;
+            color: white;
+        }
+        .dark-mode .navbar, .dark-mode .bg-light {
+            background-color: #333 !important;
+            color: white !important;
+        }
+        .dark-mode .btn-outline-dark {
+            border-color: white;
+            color: white;
+        }
+        .dark-mode .btn-outline-dark:hover {
+            background-color: #444;
+        }
+    </style>
 </head>
-<body>
+<body class="{% if request.COOKIES.dark_mode %}dark-mode{% endif %}">
     <div class="container-fluid vh-100 d-flex flex-column">
         <div class="row flex-grow-1">
-            <div class="col d-flex flex-column justify-content-center align-items-center bg-success text-white">
+            <div class="col d-flex flex-column justify-content-center align-items-center bg-dark text-white">
                 <div class="content text-center">
-                    <h1 class="display-4">Bem-vindo ao IFMG Carona!</h1>
+                    <h3 class="display-8">Bem-vindo ao IFMG Carona!</h3>
                     <p class="lead">Conecte-se com motoristas e passageiros dentro da comunidade do IFMG.</p>
                     
                     {% block conteudo %}
@@ -39,6 +62,8 @@
                         </a>
                         <img src="{% static 'img/github.png' %}" width="20px" alt="GitHub" class="ml-2">
                         <button id="btnSobre" class="btn btn-outline-dark p-2 mt-3">Sobre</button>
+                        <!-- Botão para alternar entre modo claro e escuro -->
+                        <button id="btnToggleDarkMode" class="btn btn-outline-light mt-3">Alternar Modo Escuro</button>
                     </div>
                 </div>
             </div>
@@ -48,9 +73,9 @@
     <div class="modal fade" id="jnlSobre" tabindex="-1" role="dialog" aria-labelledby="jnlSobreRotulo" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-success text-white">
                     <h5 class="modal-title" id="jnlSobreRotulo">Sobre o IFMG Carona</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -107,6 +132,15 @@
 
             $('#btnSobre').click(function() {
                 $('#jnlSobre').modal('show');
+            });
+
+            // Alternar modo escuro e claro
+            $('#btnToggleDarkMode').click(function() {
+                $('body').toggleClass('dark-mode');
+
+                // Salvar preferência no cookie
+                var darkMode = $('body').hasClass('dark-mode') ? 'true' : 'false';
+                document.cookie = "dark_mode=" + darkMode + "; path=/";
             });
         });
     </script>

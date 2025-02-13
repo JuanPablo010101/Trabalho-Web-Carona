@@ -1,0 +1,47 @@
+{% extends 'master.html' %}
+
+{% block conteudo  %}
+<div class="container mt-5">
+    <h2 class="mb-4">Oferecer uma Carona</h2>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="slcVeiculo" class="form-label">Veículo</label>
+            <select class="form-select" id="slcVeiculo" name="slcVeiculo" required>
+                {% for veiculo in veiculos %}
+                <option value="{{ veiculo.id }}">{{ veiculo.modelo }} - {{ veiculo.placa }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="txtOrigem" class="form-label">Origem</label>
+            <input type="text" class="form-control" id="txtOrigem" name="txtOrigem" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="txtDestino" class="form-label">Destino</label>
+            <input type="text" class="form-control" id="txtDestino" name="txtDestino" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="txtData_hora" class="form-label">Data e Hora</label>
+            <input type="datetime-local" class="form-control" id="txtData_hora" name="txtData_hora" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="vagas" class="form-label">Número de Vagas</label>
+            <input type="number" class="form-control" id="txtVagas" name="txtVagas" min="1" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="descricao" class="form-label">Descrição (Opcional)</label>
+            <textarea class="form-control" id="txtDescricao" name="txtDescricao"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100" name="btnAcao" id="btnAcao" value="oferecer_carona">Oferecer Carona</button>
+    </form>
+</div>
+{% endblock %}

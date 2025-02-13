@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>:: Carona IFMG ::</title>
+    <title>:: IFMG CARONA ::</title>
 
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/toastr.min.css' %}">
@@ -18,11 +18,13 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/toastr.min.js' %}"></script>
 </head>
-<body class="custom-body">
-    <div class="container-fluid">
-        <header id="menu_navegacao" class="custom-header">
-            <nav class="navbar navbar-expand-md navbar-light bg-light">
-                <a class="navbar-brand" href="{% url 'core:main' %}">HOME</a>
+<body>
+    <div class="flex-wrapper">
+        <header id="menu_navegacao">
+            <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+                {% if request.session.perfil_atual == 'Administrador' or request.session.perfil_atual == 'Estoquista' or request.session.perfil_atual == 'Vendedor' %}
+                    <a class="navbar-brand" href="{% url 'core:main' %}">HOME</a>
+                {% endif %}
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -30,33 +32,68 @@
                     <ul class="navbar-nav">
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarMenuExemplo" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Arquivo
+                                Usuario
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarMenuExemplo">
                                 <a class="dropdown-item" href="#">Meus Dados</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="{% url 'autenticacao:logout' %}">
-                                    <img src="{% static 'img/my_logout.png' %}" width="20px" alt="Logout">
+                                    <img src="{% static 'img/my_logout.png' %}" width="20px" alt="">
                                     Sair
                                 </a>
                             </div>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarMenuExemplo" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Caronas
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarMenuExemplo">
-                                <a class="dropdown-item" href="#">Oferecer Carona</a>
-                                <a class="dropdown-item" href="#">Meus Carros</a>
-                                <a class="dropdown-item" href="#">Buscar Carona</a>
-                            </div>
-                        </li>
+
+                        
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="{% url 'cadastros:cadastro_veiculo' %}" id="navbarMenuExemplo" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Cadastros
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarMenuExemplo">
+                                    <a class="dropdown-item" href="{% url 'cadastros:cadastro_veiculo'%}">Cadastro Veiculo</a>
+                                    <a class="dropdown-item" href="{% url 'cadastros:oferta_carona'%}">Oferta Carona</a>
+                                    <a class="dropdown-item" href="{% url 'cadastros:listar_caronas'%}">Listar Carona</a>
+                                </div>
+                            </li>
+                    
+                        {% if request.session.perfil_atual == 'Administrador' or request.session.perfil_atual == 'Estoquista' %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarMenuExemplo" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Estoque
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarMenuExemplo">
+                                    <a class="dropdown-item" href="#">Produtos</a>
+                                </div>
+                            </li>
+                        {% endif %}
+                        {% if request.session.perfil_atual == 'Administrador' or request.session.perfil_atual == 'Vendedor' %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarMenuExemplo" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Vendas
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarMenuExemplo">
+                                    <a class="dropdown-item" href="#">Vendas</a>
+                                </div>
+                            </li>
+                        {% endif %}
+                        {% if request.session.perfil_atual == 'Administrador' %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarMenuExemplo" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Relatórios
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarMenuExemplo">
+                                    <a class="dropdown-item" href="#">Lista de Usuário</a>
+                                    <a class="dropdown-item" href="#">Balanço</a>
+                                    <a class="dropdown-item" href="#">Contabilidade</a>
+                                </div>
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </nav>
         </header>
 
-        <div class="content mt-5">
+        <div class="content">
             {% block conteudo %}
             {% endblock %}
         </div>
@@ -66,37 +103,54 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="jnlSobreRotulo">Sobre o Sistema de Carona</h5>
+                        <h5 class="modal-title" id="jnlSobreRotulo">Sobre o PYPEL</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body text-justify">
                         <p>
-                            O Sistema de Carona IFMG foi desenvolvido para permitir que estudantes e funcionários do IFMG se cadastrem, 
-                            ofereçam caronas ou procurem caronas para facilitar o deslocamento entre o campus e os arredores.
+                            O IFMG Carona é um sistema criado para conectar motoristas e passageiros dentro da comunidade do IFMG, facilitando o compartilhamento de viagens de forma segura e eficiente. 
                         </p>
                         <p>
-                            Este projeto foi desenvolvido com o intuito de proporcionar mais praticidade e segurança aos usuários, 
-                            utilizando tecnologia web para facilitar o processo de encontrar e oferecer caronas de forma eficiente.
+                        O sistema é utilizado pelos alunos da disciplina de Programação WEB do curso de Bacharelado em Engenharia de Computação do Instituto Federal de Minas Gerais - <i>Campus</i> Bambuí, e está licenciado sob 
+                        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">
+                            Licença Creative Commons&copy; 4.0 
+                        </a> 
+                        <img src="{% static 'img/creativecommons.png' %}" width="45px" alt="Creative Commons">
+                    </p>
+
+                        <p>
+                            O IFMG Carona foi desenvolvido em <a href="https://www.python.org/" target="_blank" rel="noopener noreferrer">
+                                Python
+                            </a> <img src="{% static 'img/python.png' %}" width="15px" alt="Python">, 
+                            <a href="https://www.djangoproject.com/" target="_blank" rel="noopener noreferrer">Django</a>
+                            <img src="{% static 'img/django.png' %}" width="15px" alt="Django"> e 
+                            <a href="https://www.postgresql.org/" target="_blank" rel="noopener noreferrer">PostgreSQL</a>
+                            <img src="{% static 'img/postgresql.png' %}" width="15px" alt="PostgreSQL">. 
+                            O código fonte, juntamente com as instruções de instalação, estão disponíveis para <i>download</i> em 
+                            <a href="#" target="_blank" rel="noopener noreferrer">
+                                github.com/#
+                            </a>
+                            <img src="{% static 'img/github.png' %}" width="15px" alt="GitHub">. Você pode contribuir com o projeto, reportando erros, sugerindo melhorias ou mesmo implementando novas funcionalidades você mesmo. Por favor, use o GitHub para isso.
                         </p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <footer id="rodape" class="custom-footer">
-            <div class="footer-text text-center">
-                Sistema de Carona IFMG 
-                <button id="btnSobre" class="btn btn-info btn-sm">Sobre</button><br>
+        <footer id="rodape">
+            <div class="footer-text text-align-center">
+               IFMG Carona - é um Sistema de Gerenciamento de Caronas
+                <button id="btnSobre">Sobre</button><br>
                 Este sistema está licenciado sob 
                 <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style="color: #B0C4DE;">
                     Licença Creative Commons&copy; 4.0 
                 </a> 
                 <img src="#" width="45px" alt="Creative Commons"> <br>
                 Disponível para download em 
-                <a href="https://github.com/ifmg/carona" target="_blank" rel="noopener noreferrer" style="color: #B0C4DE;">
-                    github.com/ifmg/carona
+                <a href="#" target="_blank" rel="noopener noreferrer" style="color: #B0C4DE;">
+                    github.com/#
                 </a>
                 <img src="{% static 'img/github.png' %}" width="15px" alt="GitHub">
             </div>
@@ -148,7 +202,15 @@
 
             {% if messages %}
                 {% for message in messages %}
-                    toastr.{{ message.tags }}("{{ message }}");
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                        toastr.error("{{ message }}", "Erro");
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                        toastr.success("{{ message }}", "Sucesso");
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+                        toastr.warning("{{ message }}", "Aviso");
+                    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+                        toastr.info("{{ message }}", "Atenção");
+                    {% endif %}
                 {% endfor %}
             {% endif %}
         });

@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.db.models import ProtectedError
 
 # Gerenciador de Usuário Personalizado
 class UsuarioManager(BaseUserManager):
@@ -8,7 +7,7 @@ class UsuarioManager(BaseUserManager):
         if not email:
             raise ValueError('O usuário deve ter um endereço de e-mail')
         user = self.model(email=self.normalize_email(email), nome=nome)
-        user.set_password(password)
+        user.set_password(password)  # Senha armazenada de forma segura
         user.save(using=self._db)
         return user
 
@@ -20,8 +19,9 @@ class UsuarioManager(BaseUserManager):
 
 # Modelo de Usuário
 class Usuario(AbstractBaseUser):
-    nome = models.CharField(max_length=300)
+    nome = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
+    telefone = models.CharField(max_length=20, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
@@ -46,25 +46,23 @@ class Usuario(AbstractBaseUser):
 # Modelo de Veículo
 class Veiculo(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='veiculos')  # Protegido contra exclusão
-    marca = models.CharField(max_length=100)
-    modelo = models.CharField(max_length=100)
     placa = models.CharField(max_length=10, unique=True)
-    cor = models.CharField(max_length=50)
-    ano = models.PositiveIntegerField()
-    capacidade = models.PositiveIntegerField()  # Quantidade máxima de passageiros (excluindo o motorista)
+    modelo = models.CharField(max_length=50)
+    cor = models.CharField(max_length=30, blank=True, null=True)
+    ano = models.PositiveIntegerField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.marca} {self.modelo} - {self.placa}"
+        return f"{self.modelo} - {self.placa}"
 
 # Modelo de Oferta de Carona
 class OfertaCarona(models.Model):
     motorista = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='ofertas')  # Protegido contra exclusão
     veiculo = models.ForeignKey(Veiculo, on_delete=models.PROTECT, related_name='caronas')  # Protegido contra exclusão
-    origem = models.CharField(max_length=255)
-    destino = models.CharField(max_length=255)
-    data_hora = models.DateTimeField()
+    origem = models.CharField(max_length=100)
+    destino = models.CharField(max_length=100)
+    data_hora = models.DateTimeField()  # Combina data e hora da viagem
+    vagas_ofertadas = models.PositiveIntegerField(default=0)  # Valor padrão definido como 0
     descricao = models.TextField(blank=True, null=True)
-    vagas = models.PositiveIntegerField()
     status = models.CharField(
         max_length=20,
         choices=[('aberta', 'Aberta'), ('encerrada', 'Encerrada'), ('cancelada', 'Cancelada')],
@@ -72,6 +70,11 @@ class OfertaCarona(models.Model):
     )
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
+
+    def vagas_disponiveis(self):
+        """ Calcula automaticamente o número de vagas disponíveis. """
+        reservas_confirmadas = self.reservas.filter(status='confirmada').count()
+        return self.vagas_ofertadas - reservas_confirmadas
 
     def __str__(self):
         return f"{self.origem} -> {self.destino} ({self.data_hora})"

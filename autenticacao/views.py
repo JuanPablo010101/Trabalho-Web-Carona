@@ -24,6 +24,7 @@ def login(request):
                 
                 request.session['id_atual'] = usuario.id
                 request.session['email_atual'] = usuario.email
+                request.session['telefone'] = usuario.telefone
                 #configura sessao para expirar em 4 horas
                 request.session.set_expiry(14400)
                 messages.success(request, 'Login realizado com sucesso.')
