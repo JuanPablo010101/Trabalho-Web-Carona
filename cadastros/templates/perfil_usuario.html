@@ -1,0 +1,24 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block conteudo %}
+
+<div class="tab-pane fade show active" id="perfil">
+  <h2 class="mb-4">Perfil de {{ user.nome }}</h2>
+  <div class="card">
+    <div class="card-body">
+      <div class="text-center">
+        <!-- Verificando se o usuário tem uma imagem de perfil, caso contrário exibe uma imagem estática -->
+        {% if user.profile_picture %}
+          <img src="{{ user.profile_picture.url }}" alt="Imagem de perfil" class="img-fluid rounded-circle" style="max-width: 150px;">
+        {% else %}
+          <img src="{% static 'img/perfil-imagem.png' %}" alt="Imagem de perfil" class="img-fluid rounded-circle" style="max-width: 150px;">
+        {% endif %}
+      </div>
+      <h5 class="card-title"><strong>Nome:</strong> {{ user.nome }}</h5>
+      <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
+      <p class="card-text"><strong>Telefone:</strong> {{ user.telefone }}</p>
+      <a href="{% url 'cadastros:editar_perfil' %}" class="btn btn-success w-100">Editar Perfil</a><br><br>
+    </div>
+  </div>
+</div>
+{% endblock %}

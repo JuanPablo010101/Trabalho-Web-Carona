@@ -1,0 +1,45 @@
+{% extends 'master.html' %}
+
+{% load static %} 
+{% block conteudo %}
+<div>
+    <!-- Home -->
+          <div class="tab-pane fade show active" id="home">
+            <h2>Bem-vindo ao Carona Fácil</h2>
+            <p>Aqui você pode encontrar ou oferecer caronas de forma simples e segura.</p>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card mb-3">
+                  <!--<img src="https://via.placeholder.com/400x200" class="card-img-top" alt="Imagem da Home">-->
+                  <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-people-fill"></i> Encontre Caronas</h5>
+                    <p class="card-text">Busque ofertas de carona com base no seu destino.</p>
+                    <a href="#solicitar" class="btn btn-primary" data-bs-toggle="tab">Buscar</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card mb-3">
+                  <!--<img src="https://via.placeholder.com/400x200" class="card-img-top" alt="Imagem da Home">-->
+                  <div class="card-body">
+                    <h5 class="card-title"> <i class="bi bi-car-front-fill"></i> Oferecer Carona</h5>
+                    <p class="card-text">Compartilhe seu veículo e ajude na mobilidade.</p>
+                    <a href="{% url 'cadastros:oferta_carona' %}" class="btn btn-success" data-bs-toggle="tab">Oferecer</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card mb-3">
+                  <!--<img src="https://via.placeholder.com/400x200" class="card-img-top" alt="Imagem da Home">-->
+                  <div class="card-body">
+                    <h5 class="card-title"> <i class="bi bi-clock-history"></i> Ver Histórico</h5>
+                    <p class="card-text">Acompanhe suas viagens realizadas.</p>
+                    <a href="#historico" class="btn btn-info" data-bs-toggle="tab">Histórico</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+</div>
+{% endblock %}
