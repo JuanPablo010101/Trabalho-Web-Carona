@@ -109,7 +109,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'db_carona',
         'USER': 'postgres',
-        'PASSWORD': '',
+        'PASSWORD': '32614943',
         'HOST': 'localhost', 
         'PORT': '5432',
     }

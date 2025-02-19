@@ -43,7 +43,6 @@ def cadastro_usuario(request):
 
 @login_required
 def perfil_usuario(request): 
-    print("A view do perfil foi chamada!") 
     usuario = request.user
     return render(request, 'perfil_usuario.html', {'user': usuario})
 
@@ -51,7 +50,7 @@ def perfil_usuario(request):
 def editar_perfil(request):
     usuario = request.user
 
-    # Se o formulário for enviado via POST
+    
     if request.method == 'POST':
         # Coleta os dados enviados pelo formulário
         nome = request.POST.get('id_nome')
@@ -63,10 +62,10 @@ def editar_perfil(request):
         # Verificação de atualização de senha
         if senha:
             # Verifica se a senha fornecida corresponde à senha armazenada
-            if not usuario.check_password(senha):  # Verifica se a senha fornecida corresponde à armazenada
+            if not usuario.check_password(senha): 
                 messages.error(request, 'A nova senha não pode ser igual à senha atual.')
-                usuario.set_password(senha)  # Atualiza a senha
-                usuario.save()  # Salva o usuário com a nova senha
+                usuario.set_password(senha) 
+                usuario.save()
                 messages.success(request, 'Senha alterada com sucesso! Faça login novamente.')
             else:
                 
@@ -100,13 +99,13 @@ def oferta_carona(request):
     if request.method == 'POST':
         acao = request.POST.get('btnAcao')
         if acao == "oferecer_carona":
-            # Já temos o usuário autenticado, não precisa buscar de novo            
+            # Busca motorista que é o Usuario          
             motorista = request.user  
             # Obtendo os dados do formulário
             origem = request.POST.get('txtOrigem')
             destino = request.POST.get('txtDestino')
-            data = request.POST.get('txtData')  # Data no formato 'YYYY-MM-DD'
-            hora = request.POST.get('txtHora')  # Hora no formato 'HH:MM'
+            data = request.POST.get('txtData')  
+            hora = request.POST.get('txtHora') 
             num_vagas = request.POST.get('txtVagas')
             descricao = request.POST.get('txtDescricao')
 
@@ -159,9 +158,9 @@ def alterar_status_oferta(request):
             elif acao == 'finalizar':
                 oferta.status = 'encerrada'
                 messages.success(request, 'Oferta finalizada com sucesso!')
-            elif acao == 'reservar':  # Verificando a ação 'reservar'
+           # elif acao == 'reservar':  # Verificando a ação 'reservar'
                 # Redireciona para a página de reserva
-                return redirect('cadastros:reservar_carona', oferta_id=oferta.id)
+            #    return redirect('cadastros:reservar_carona', oferta_id=oferta.id)
             else:
                 messages.error(request, 'Ação inválida.')
             
@@ -204,13 +203,13 @@ def aceita_reserva(request):
 
             # Decrementa o número de vagas disponíveis
             oferta.vagas_ofertadas -= 1
-            oferta.save()  # Salva a oferta com o novo número de vagas
+            oferta.save()  
 
             messages.success(request, 'Reserva realizada com sucesso! Aguarde a aprovação do motorista.')
         else:
             messages.error(request, 'Não há mais vagas disponíveis.')
 
-    return redirect('cadastros:reservar_carona')  # Redireciona para a página de ofertas
+    return redirect('cadastros:reservar_carona') 
 
 @login_required
 def minhas_reservas(request):
@@ -223,15 +222,16 @@ def minhas_reservas(request):
 
 @login_required
 def cancelar_reserva(request):
-    reserva_id = request.GET.get("reserva_id")  # Obtém o ID da reserva via GET
+    reserva_id = request.GET.get("reserva_id")  # Obtém o ID da reserva 
     
-    if reserva_id:
+    if reserva_id: # Verifica se o ID da reserva foi fornecido
+        # Busca a reserva pelo ID e pelo passageiro
         reserva = ReservaCarona.objects.filter(id=reserva_id, passageiro=request.user).first()
-        
+        # Verifica se a reserva existe e se não foi cancelada
         if reserva and reserva.status != "Cancelada":
             reserva.status = "Cancelada"
             reserva.oferta.vagas_ofertadas += 1  # Devolve a vaga para a oferta
-            reserva.oferta.save()  # Salva as alterações na oferta (incrementa a vaga)
-            reserva.save()  # Salva as alterações na reserva (marca como cancelada)
+            reserva.oferta.save()  # Salva as alterações na oferta 
+            reserva.save() 
 
     return redirect('cadastros:minhas_reservas')

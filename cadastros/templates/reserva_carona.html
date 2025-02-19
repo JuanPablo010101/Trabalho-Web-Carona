@@ -2,7 +2,7 @@
 
 {% block conteudo %}
 <div class="container mt-5">
-    <h2 class="mb-4">Ofertas de Carona Disponíveis</h2>
+    <h2 class="mb-4" style="color: #2c09ca;">Ofertas de Carona Disponíveis</h2>
 
     {% if ofertas %}
         <div class="table-responsive">
@@ -50,5 +50,6 @@
             Nenhuma carona disponível no momento.
         </div>
     {% endif %}
+    <a href="{% url 'autenticacao:volta_home' %}" class="btn btn-primary float-end btn-sm w-100">Voltar</a>
 </div>
 {% endblock %}

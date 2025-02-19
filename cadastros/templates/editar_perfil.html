@@ -3,7 +3,7 @@
 
 {% block conteudo %}
 <div class="container mt-5">
-    <h2 class="mb-4 text-center">Editar Perfil</h2>
+    <h2 class="mb-4 text-center" style="color: #2c09ca;">Editar Perfil</h2>
 
     <form method="POST" enctype="multipart/form-data" action="{% url 'cadastros:editar_perfil' %}">
         {% csrf_token %}

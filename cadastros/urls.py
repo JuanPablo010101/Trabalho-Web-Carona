@@ -14,9 +14,7 @@ urlpatterns = [
     path('reservar_carona/', views.reservar_carona, name='reservar_carona'),
     path('aceita_reserva/', views.aceita_reserva, name='aceita_reserva'),
     path('minhas_reservas/', views.minhas_reservas, name='minhas_reservas'),
-    path('cancelar_reserva/', views.cancelar_reserva, name='cancelar_reserva'),
-   # path('finalizar_oferta/', views.finalizar_oferta, name='finalizar_oferta'),
-   
+    path('cancelar_reserva/', views.cancelar_reserva, name='cancelar_reserva'),   
 ]
     
 

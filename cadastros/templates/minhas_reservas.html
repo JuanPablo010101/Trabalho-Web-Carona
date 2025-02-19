@@ -2,7 +2,8 @@
 
 {% block conteudo %}
 <div class="container mt-5">
-    <h2 class="mb-4">Minhas Reservas</h2>
+    <h2 class="mb-4" style="color: #2c09ca;">Minhas Reservas</h2>
+    <hr style="border: 1px solid #2c09ca;">
 
     {% if reservas_ativas %}
         <h3>Reservas Ativas</h3>
@@ -30,7 +31,7 @@
                         <td>{{ reserva.oferta.motorista.nome }}</td>
                         <td>
                             <a href="tel:{{ reserva.oferta.motorista.telefone }}" class="btn btn-info btn-sm">
-                                📞 {{ reserva.oferta.motorista.telefone }}
+                                 {{ reserva.oferta.motorista.telefone }}
                             </a>
                         </td>
                         <td>
@@ -40,7 +41,7 @@
                             <a href="{% url 'cadastros:cancelar_reserva' %}?reserva_id={{ reserva.id }}" 
                                class="btn btn-danger btn-sm" 
                                onclick="return confirm('Tem certeza que deseja cancelar esta reserva?');">
-                                ❌ Cancelar
+                                 Cancelar
                             </a>
                         </td>
                     </tr>
@@ -53,6 +54,9 @@
             Você não tem reservas ativas.
         </div>
     {% endif %}
+    
+    <hr style="border: 1px solid #000;">
+
 
     {% if reservas_canceladas %}
         <h3 class="mt-4">Reservas Canceladas</h3>
@@ -79,7 +83,7 @@
                         <td>{{ reserva.oferta.motorista.nome }}</td>
                         <td>
                             <a href="tel:{{ reserva.oferta.motorista.telefone }}" class="btn btn-info btn-sm">
-                                📞 {{ reserva.oferta.motorista.telefone }}
+                                 {{ reserva.oferta.motorista.telefone }}
                             </a>
                         </td>
                         <td>
@@ -89,6 +93,8 @@
                     {% endfor %}
                 </tbody>
             </table>
+            
+            <a href="{% url 'autenticacao:volta_home' %}" class="btn btn-primary float-end btn-sm w-100">Voltar</a>
         </div>
     {% endif %}
 </div>

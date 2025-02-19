@@ -2,7 +2,7 @@
 
 {% block conteudo %}
 <div class="container mt-5">
-    <h2 class="mb-4">Oferecer uma Carona</h2>
+    <h2 class="mb-4" style="color: #2c09ca;">Oferecer uma Carona</h2>
 
     <form method="POST">
         {% csrf_token %}
@@ -44,6 +44,10 @@
         </div>
 
         <button type="submit" class="btn btn-success w-100" name="btnAcao" id="btnAcao" value="oferecer_carona">Oferecer Carona</button>
+        
     </form>
+    <br>
+        <a href="{% url 'autenticacao:volta_home' %}" class="btn btn-primary float-end btn-sm w-100">Voltar</a>
+    
 </div>
 {% endblock %}
