@@ -1,7 +1,8 @@
 from django.shortcuts import redirect, render
 from django.contrib import messages
-from cadastros.models import OfertaCarona, Usuario
+from cadastros.models import OfertaCarona, ReservaCarona, Usuario
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 def cadastro_usuario(request):
     if request.method == 'POST':
@@ -92,15 +93,145 @@ def editar_perfil(request):
     else:
         return render(request, 'editar_perfil.html', {'user': usuario})
      
+
+
 @login_required
 def oferta_carona(request):
-    print("Passei em Oferta Carona")   
+    if request.method == 'POST':
+        acao = request.POST.get('btnAcao')
+        if acao == "oferecer_carona":
+            # Já temos o usuário autenticado, não precisa buscar de novo            
+            motorista = request.user  
+            # Obtendo os dados do formulário
+            origem = request.POST.get('txtOrigem')
+            destino = request.POST.get('txtDestino')
+            data = request.POST.get('txtData')  # Data no formato 'YYYY-MM-DD'
+            hora = request.POST.get('txtHora')  # Hora no formato 'HH:MM'
+            num_vagas = request.POST.get('txtVagas')
+            descricao = request.POST.get('txtDescricao')
+
+            # Combinando data e hora para criar o valor de 'data_hora'
+            try:
+                data_hora_str = f"{data} {hora}"  # Combine a data e a hora
+                data_hora = datetime.strptime(data_hora_str, "%Y-%m-%d %H:%M")
+
+                # Criando a oferta de carona
+                oferta = OfertaCarona(
+                    motorista=motorista,
+                    origem=origem,
+                    destino=destino,
+                    data_hora=data_hora,
+                    vagas_ofertadas=num_vagas,
+                    descricao=descricao,
+                    status='Aberta'
+                )
+                oferta.save()
+                messages.success(request, 'Oferta de Carona cadastrada com sucesso!')
+                # Redirecionamento correto após o cadastro
+                return redirect('autenticacao:volta_home')  
+            except Exception as e:
+                messages.error(request, f'Ocorreu um erro ao cadastrar a carona: {e}')
+                return redirect('cadastros:oferta_carona')
+                
     return render(request, 'oferta_carona.html')
 
 
 
 @login_required
-def listar_caronas(request):
-    ofertas = OfertaCarona.objects.filter(status='Aberta').exclude(motorista=request.user).order_by('data_hora')
-    return render(request, 'lista_ofertas.html', {'ofertas': ofertas})
+def minhas_ofertas(request):
+    # Buscar todas as ofertas de carona do usuário autenticado
+    ofertas = OfertaCarona.objects.filter(motorista=request.user)
 
+    return render(request, 'minhas_ofertas.html', {'ofertas': ofertas})
+
+@login_required
+def alterar_status_oferta(request):
+    if request.method == 'POST':
+        oferta_id = request.POST.get('oferta_id')
+        acao = request.POST.get('acao')
+
+        try:
+            oferta = OfertaCarona.objects.get(id=oferta_id, motorista=request.user)
+
+            if acao == 'cancelar':
+                oferta.status = 'cancelada'
+                messages.success(request, 'Oferta cancelada com sucesso!')
+            elif acao == 'finalizar':
+                oferta.status = 'encerrada'
+                messages.success(request, 'Oferta finalizada com sucesso!')
+            elif acao == 'reservar':  # Verificando a ação 'reservar'
+                # Redireciona para a página de reserva
+                return redirect('cadastros:reservar_carona', oferta_id=oferta.id)
+            else:
+                messages.error(request, 'Ação inválida.')
+            
+            oferta.save()  # Salva as alterações
+
+        except OfertaCarona.DoesNotExist:
+            messages.error(request, 'Oferta não encontrada ou você não tem permissão para alterá-la.')
+
+    return redirect('cadastros:minhas_ofertas')
+
+
+
+@login_required
+def reservar_carona(request):
+    # Buscar todas as ofertas de carona com o status 'aberta', excluindo as que o usuário publicou
+    ofertas = OfertaCarona.objects.filter(status__in=['Aberta', 'aberta']) \
+                                  .exclude(motorista=request.user)  # Exclui ofertas do próprio motorista
+
+    # Obter os IDs das ofertas que o usuário já reservou
+    reservas_feitas_ids = ReservaCarona.objects.filter(passageiro=request.user).values_list('oferta_id', flat=True)
+
+    return render(request, 'reserva_carona.html', {'ofertas': ofertas, 'reservas_feitas_ids': reservas_feitas_ids})
+
+@login_required
+def aceita_reserva(request):
+    if request.method == 'POST':
+        oferta_id = request.POST.get('oferta_id')
+        oferta = OfertaCarona.objects.filter(id=oferta_id).first()
+
+        if not oferta:
+            messages.error(request, 'Carona não encontrada.')
+            return redirect('cadastros:minhas_ofertas')
+
+        # Verifica se o usuário já reservou essa carona
+        if ReservaCarona.objects.filter(oferta=oferta, passageiro=request.user).exists():
+            messages.error(request, 'Você já tem uma reserva para essa carona.')
+        elif oferta.vagas_disponiveis() > 0:  # Verifica se há vagas disponíveis
+            # Cria a reserva
+            reserva = ReservaCarona.objects.create(oferta=oferta, passageiro=request.user, status='Confirmada')
+
+            # Decrementa o número de vagas disponíveis
+            oferta.vagas_ofertadas -= 1
+            oferta.save()  # Salva a oferta com o novo número de vagas
+
+            messages.success(request, 'Reserva realizada com sucesso! Aguarde a aprovação do motorista.')
+        else:
+            messages.error(request, 'Não há mais vagas disponíveis.')
+
+    return redirect('cadastros:reservar_carona')  # Redireciona para a página de ofertas
+
+@login_required
+def minhas_reservas(request):
+    # Obtém todas as reservas do usuário logado
+    reservas_ativas = ReservaCarona.objects.filter(passageiro=request.user, status="Confirmada").select_related('oferta', 'oferta__motorista')
+    reservas_canceladas = ReservaCarona.objects.filter(passageiro=request.user, status="Cancelada").select_related('oferta', 'oferta__motorista')
+
+    # Passa todas as reservas para o template
+    return render(request, 'minhas_reservas.html', {'reservas_ativas': reservas_ativas, 'reservas_canceladas': reservas_canceladas})
+
+@login_required
+def cancelar_reserva(request):
+    reserva_id = request.GET.get("reserva_id")  # Obtém o ID da reserva via GET
+    
+    if reserva_id:
+        reserva = ReservaCarona.objects.filter(id=reserva_id, passageiro=request.user).first()
+        
+        if reserva and reserva.status != "Cancelada":
+            reserva.status = "Cancelada"
+            reserva.oferta.vagas_ofertadas += 1  # Devolve a vaga para a oferta
+            reserva.oferta.save()  # Salva as alterações na oferta (incrementa a vaga)
+            reserva.save()  # Salva as alterações na reserva (marca como cancelada)
+
+    return redirect('cadastros:minhas_reservas')

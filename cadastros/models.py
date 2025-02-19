@@ -62,10 +62,11 @@ class OfertaCarona(models.Model):
     data_atualizacao = models.DateTimeField(auto_now=True)
 
     def vagas_disponiveis(self):
-        """ Calcula automaticamente o número de vagas disponíveis. """
-        reservas_confirmadas = self.reservas.filter(status='confirmada').count()
-        return self.vagas_ofertadas - reservas_confirmadas
-
+         # Calcula as vagas restantes
+        reservas = ReservaCarona.objects.filter(oferta=self).count()  # Conta as reservas para esta oferta
+        vagas_restantes = self.vagas_ofertadas - reservas
+        return max(vagas_restantes, 0)
+    
     def __str__(self):
         return f"{self.origem} -> {self.destino} ({self.data_hora})"
 
@@ -74,12 +75,19 @@ class ReservaCarona(models.Model):
     oferta = models.ForeignKey(OfertaCarona, on_delete=models.PROTECT, related_name='reservas')  # Protegido contra exclusão
     passageiro = models.ForeignKey(Usuario, on_delete=models.PROTECT, related_name='reservas')  # Protegido contra exclusão
     data_reserva = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(
-        max_length=20,
-        choices=[('pendente', 'Pendente'), ('confirmada', 'Confirmada'), ('cancelada', 'Cancelada')],
-        default='pendente'
-    )
+    status = models.CharField(max_length=20)
+    def save(self, *args, **kwargs):
+        # Verifica se há vagas disponíveis
+        if self.oferta.vagas_disponiveis() > 0:
+            super().save(*args, **kwargs)  # Salva a reserva
+            # Decrementa o número de vagas na oferta de carona
+            self.oferta.vagas_ofertadas -= 1
+            self.oferta.save()
+        else:
+            raise ValueError("Não há vagas disponíveis para esta carona.")
 
+    def __str__(self):
+        return f"Reserva de {self.passageiro.nome} para a carona {self.oferta.origem} -> {self.oferta.destino}"
     class Meta:
         unique_together = ('oferta', 'passageiro')  # Evita reservas duplicadas para a mesma carona
 

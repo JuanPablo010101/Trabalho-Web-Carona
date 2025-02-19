@@ -1,26 +1,95 @@
-{% extends 'base.html' %}
+{% extends 'master.html' %}
 
-{% block content %}
+{% block conteudo %}
 <div class="container mt-5">
     <h2 class="mb-4">Minhas Reservas</h2>
 
-    {% for reserva in reservas %}
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5 class="card-title">{{ reserva.oferta.origem }} → {{ reserva.oferta.destino }}</h5>
-            <p class="card-text"><strong>Data:</strong> {{ reserva.oferta.data_hora }}</p>
-            <p class="card-text"><strong>Status:</strong> {{ reserva.get_status_display }}</p>
-
-            {% if reserva.status == 'pendente' %}
-            <form method="POST" action="{% url 'cancelar_reserva' reserva.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Cancelar</button>
-            </form>
-            {% endif %}
+    {% if reservas_ativas %}
+        <h3>Reservas Ativas</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Origem</th>
+                        <th>Destino</th>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Motorista</th>
+                        <th>Telefone</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas_ativas %}
+                    <tr>
+                        <td>{{ reserva.oferta.origem }}</td>
+                        <td>{{ reserva.oferta.destino }}</td>
+                        <td>{{ reserva.oferta.data_hora|date:"d/m/Y" }}</td>
+                        <td>{{ reserva.oferta.data_hora|time:"H:i" }}</td>
+                        <td>{{ reserva.oferta.motorista.nome }}</td>
+                        <td>
+                            <a href="tel:{{ reserva.oferta.motorista.telefone }}" class="btn btn-info btn-sm">
+                                📞 {{ reserva.oferta.motorista.telefone }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ reserva.status }}</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'cadastros:cancelar_reserva' %}?reserva_id={{ reserva.id }}" 
+                               class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Tem certeza que deseja cancelar esta reserva?');">
+                                ❌ Cancelar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </div>
-    {% empty %}
-    <p>Você não possui reservas ativas.</p>
-    {% endfor %}
+    {% else %}
+        <div class="alert alert-warning text-center" role="alert">
+            Você não tem reservas ativas.
+        </div>
+    {% endif %}
+
+    {% if reservas_canceladas %}
+        <h3 class="mt-4">Reservas Canceladas</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-danger">
+                    <tr>
+                        <th>Origem</th>
+                        <th>Destino</th>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Motorista</th>
+                        <th>Telefone</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas_canceladas %}
+                    <tr>
+                        <td>{{ reserva.oferta.origem }}</td>
+                        <td>{{ reserva.oferta.destino }}</td>
+                        <td>{{ reserva.oferta.data_hora|date:"d/m/Y" }}</td>
+                        <td>{{ reserva.oferta.data_hora|time:"H:i" }}</td>
+                        <td>{{ reserva.oferta.motorista.nome }}</td>
+                        <td>
+                            <a href="tel:{{ reserva.oferta.motorista.telefone }}" class="btn btn-info btn-sm">
+                                📞 {{ reserva.oferta.motorista.telefone }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-danger">Cancelada</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

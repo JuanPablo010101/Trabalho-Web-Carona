@@ -1,0 +1,67 @@
+{% extends 'master.html' %}
+
+{% block conteudo %}
+<div class="container mt-5">
+    <h2 class="mb-4">Minhas Ofertas de Carona</h2>
+
+    {% if ofertas %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Origem</th>
+                        <th>Destino</th>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Vagas</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for oferta in ofertas %}
+                    <tr>
+                        <td>{{ oferta.origem }}</td>
+                        <td>{{ oferta.destino }}</td>
+                        <td>{{ oferta.data_hora|date:"d/m/Y" }}</td>
+                        <td>{{ oferta.data_hora|time:"H:i" }}</td>
+                        <td>{{ oferta.vagas_disponiveis }}</td>
+                        <td>
+                            {% if oferta.status == 'aberta' or oferta.status == 'Aberta' %}
+                                <span class="badge bg-success">Aberta</span>
+                            {% elif oferta.status == 'encerrada' %}
+                                <span class="badge bg-primary">Encerrada</span>
+                            {% else %}
+                                <span class="badge bg-danger">Cancelada</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if oferta.status == 'aberta' or oferta.status == 'Aberta' %}
+                                <form method="POST" action="{% url 'cadastros:alterar_status_oferta' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="oferta_id" value="{{ oferta.id }}">
+                                    
+                                    <button type="submit" name="acao" value="cancelar" class="btn btn-danger btn-sm">
+                                        Cancelar
+                                    </button>
+
+                                    <button type="submit" name="acao" value="finalizar" class="btn btn-primary btn-sm">
+                                        Finalizar
+                                    </button>
+                                </form>
+                            {% else %}
+                                <button class="btn btn-secondary btn-sm" disabled>Indisponível</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center" role="alert">
+            Você ainda não ofereceu nenhuma carona.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

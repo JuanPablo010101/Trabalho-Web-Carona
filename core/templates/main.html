@@ -13,8 +13,8 @@
                   <!--<img src="https://via.placeholder.com/400x200" class="card-img-top" alt="Imagem da Home">-->
                   <div class="card-body">
                     <h5 class="card-title"><i class="bi bi-people-fill"></i> Encontre Caronas</h5>
-                    <p class="card-text">Busque ofertas de carona com base no seu destino.</p>
-                    <a href="#solicitar" class="btn btn-primary" data-bs-toggle="tab">Buscar</a>
+                    <p class="card-text">Busque ofertas de carona.</p>
+                    <a href="{% url 'cadastros:reservar_carona' %}" class="btn btn-primary" >Buscar</a>
                   </div>
                 </div>
               </div>
@@ -24,7 +24,7 @@
                   <div class="card-body">
                     <h5 class="card-title"> <i class="bi bi-car-front-fill"></i> Oferecer Carona</h5>
                     <p class="card-text">Compartilhe seu veículo e ajude na mobilidade.</p>
-                    <a href="{% url 'cadastros:oferta_carona' %}" class="btn btn-success" data-bs-toggle="tab">Oferecer</a>
+                    <a href="{% url 'cadastros:oferta_carona' %}" class="btn btn-success" >Oferecer</a>
                   </div>
                 </div>
               </div>
@@ -34,7 +34,7 @@
                   <div class="card-body">
                     <h5 class="card-title"> <i class="bi bi-clock-history"></i> Ver Histórico</h5>
                     <p class="card-text">Acompanhe suas viagens realizadas.</p>
-                    <a href="#historico" class="btn btn-info" data-bs-toggle="tab">Histórico</a>
+                    <a href="#historico" class="btn btn-info" >Histórico</a>
                   </div>
                 </div>
               </div>

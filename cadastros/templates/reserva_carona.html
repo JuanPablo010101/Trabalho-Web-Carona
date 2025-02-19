@@ -1,25 +1,54 @@
-{% extends 'base.html' %}
+{% extends 'master.html' %}
 
-{% block content %}
+{% block conteudo %}
 <div class="container mt-5">
-    <h2 class="mb-4">Reservar Carona</h2>
+    <h2 class="mb-4">Ofertas de Carona Disponíveis</h2>
 
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{{ oferta.origem }} → {{ oferta.destino }}</h5>
-            <p class="card-text"><strong>Data:</strong> {{ oferta.data_hora }}</p>
-            <p class="card-text"><strong>Vagas Disponíveis:</strong> {{ oferta.vagas_disponiveis }}</p>
-            <p class="card-text"><strong>Motorista:</strong> {{ oferta.motorista.nome }}</p>
-
-            {% if oferta.vagas_disponiveis > 0 %}
-            <form method="POST">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
-            </form>
-            {% else %}
-            <button class="btn btn-danger" disabled>Sem vagas disponíveis</button>
-            {% endif %}
+    {% if ofertas %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Origem</th>
+                        <th>Destino</th>
+                        <th>Data</th>
+                        <th>Hora</th>
+                        <th>Vagas</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for oferta in ofertas %}
+                    <tr>
+                        <td>{{ oferta.origem }}</td>
+                        <td>{{ oferta.destino }}</td>
+                        <td>{{ oferta.data_hora|date:"d/m/Y" }}</td>
+                        <td>{{ oferta.data_hora|time:"H:i" }}</td>
+                        <td>{{ oferta.vagas_disponiveis }}</td>
+                        <td>
+                            {% if oferta.vagas_disponiveis > 0 %}
+                                {% if oferta.id in reservas_feitas_ids %}
+                                    <button class="btn btn-secondary btn-sm" disabled>Reservado</button>
+                                {% else %}
+                                    <form method="POST" action="{% url 'cadastros:aceita_reserva' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="oferta_id" value="{{ oferta.id }}">
+                                        <button type="submit" name="acao" value="reservar" class="btn btn-success btn-sm">Reservar</button>
+                                    </form>
+                                {% endif %}
+                            {% else %}
+                                <button class="btn btn-secondary btn-sm" disabled>Esgotado</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </div>
+    {% else %}
+        <div class="alert alert-warning text-center" role="alert">
+            Nenhuma carona disponível no momento.
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
